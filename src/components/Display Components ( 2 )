@@ -1,0 +1,141 @@
+#src/components/ActivityCard.tsx
+
+import { Card, CardContent } from '@/components/ui/card';
+import { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface ActivityCardProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  selected: boolean;
+  onClick: () => void;
+}
+
+export function ActivityCard({ icon: Icon, title, description, selected, onClick }: ActivityCardProps) {
+  return (
+    <Card
+      className={cn(
+        'cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg',
+        selected && 'ring-2 ring-primary shadow-lg bg-primary/5'
+      )}
+      onClick={onClick}
+    >
+      <CardContent className="p-6 text-center">
+        <div className={cn(
+          'mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors',
+          selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+        )}>
+          <Icon className="w-8 h-8" />
+        </div>
+        <h3 className="font-semibold text-lg mb-2">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+
+
+#src/components/EmissionChart.tsx 
+
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ActivityType } from '@/types/carbon';
+
+interface EmissionChartProps {
+  byActivity: Record<ActivityType, number>;
+}
+
+const COLORS = {
+  vehicle: 'hsl(var(--chart-1))',
+  electricity: 'hsl(var(--chart-2))',
+  food: 'hsl(var(--chart-3))',
+  flight: 'hsl(var(--chart-4))',
+};
+
+const ACTIVITY_NAMES = {
+  vehicle: 'Vehicle',
+  electricity: 'Electricity',
+  food: 'Food',
+  flight: 'Flight',
+};
+
+export function EmissionChart({ byActivity }: EmissionChartProps) {
+  const barData = Object.entries(byActivity)
+    .filter(([_, value]) => value > 0)
+    .map(([key, value]) => ({
+      name: ACTIVITY_NAMES[key as ActivityType],
+      emissions: parseFloat(value.toFixed(2)),
+    }));
+
+  const pieData = Object.entries(byActivity)
+    .filter(([_, value]) => value > 0)
+    .map(([key, value]) => ({
+      name: ACTIVITY_NAMES[key as ActivityType],
+      value: parseFloat(value.toFixed(2)),
+    }));
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle>Emissions by Activity</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={barData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+              <YAxis stroke="hsl(var(--muted-foreground))" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                }}
+                formatter={(value: number) => [`${value} kg CO₂`, 'Emissions']}
+              />
+              <Bar dataKey="emissions" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Emission Distribution</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[entry.name.toLowerCase() as ActivityType]} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                }}
+                formatter={(value: number) => `${value} kg CO₂`}
+              />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
