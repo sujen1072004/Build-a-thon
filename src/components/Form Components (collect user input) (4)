@@ -1,0 +1,334 @@
+#src/components/ElectricityForm.tsx----------------------------------------
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ElectricityData } from '@/types/carbon';
+
+interface ElectricityFormProps {
+  onSubmit: (data: ElectricityData) => void;
+  onCancel: () => void;
+}
+
+export function ElectricityForm({ onSubmit, onCancel }: ElectricityFormProps) {
+  const [data, setData] = useState<ElectricityData>({
+    usage: 0,
+    energySource: '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="usage">Electricity Usage (kWh)</Label>
+        <Input
+          id="usage"
+          type="number"
+          min="0"
+          step="0.1"
+          value={data.usage || ''}
+          onChange={(e) => setData({ ...data, usage: parseFloat(e.target.value) || 0 })}
+          placeholder="e.g., 300"
+          required
+        />
+        <p className="text-xs text-muted-foreground">Average household uses 300-900 kWh per month</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="energySource">Energy Source</Label>
+        <Select value={data.energySource} onValueChange={(value) => setData({ ...data, energySource: value })}>
+          <SelectTrigger id="energySource">
+            <SelectValue placeholder="Select energy source" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="coal">Coal</SelectItem>
+            <SelectItem value="naturalGas">Natural Gas</SelectItem>
+            <SelectItem value="solar">Solar</SelectItem>
+            <SelectItem value="wind">Wind</SelectItem>
+            <SelectItem value="nuclear">Nuclear</SelectItem>
+            <SelectItem value="mixed">Mixed (Grid Average)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex gap-3 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+          Cancel
+        </Button>
+        <Button type="submit" className="flex-1">
+          Calculate Emissions
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+#src/components/FlightForm.tsx-------------------------------------------
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FlightData } from '@/types/carbon';
+
+interface FlightFormProps {
+  onSubmit: (data: FlightData) => void;
+  onCancel: () => void;
+}
+
+export function FlightForm({ onSubmit, onCancel }: FlightFormProps) {
+  const [data, setData] = useState<FlightData>({
+    distance: 0,
+    flightClass: '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="distance">Flight Distance (km)</Label>
+        <Input
+          id="distance"
+          type="number"
+          min="0"
+          step="0.1"
+          value={data.distance || ''}
+          onChange={(e) => setData({ ...data, distance: parseFloat(e.target.value) || 0 })}
+          placeholder="e.g., 1500"
+          required
+        />
+        <p className="text-xs text-muted-foreground">
+          Short-haul: &lt;1500km | Medium: 1500-4000km | Long-haul: &gt;4000km
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="flightClass">Flight Class</Label>
+        <Select value={data.flightClass} onValueChange={(value) => setData({ ...data, flightClass: value })}>
+          <SelectTrigger id="flightClass">
+            <SelectValue placeholder="Select flight class" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="economy">Economy</SelectItem>
+            <SelectItem value="business">Business</SelectItem>
+            <SelectItem value="first">First Class</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Business & First class have higher emissions per passenger
+        </p>
+      </div>
+
+      <div className="flex gap-3 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+          Cancel
+        </Button>
+        <Button type="submit" className="flex-1">
+          Calculate Emissions
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+
+
+#src/components/VehicleForm.tsx----------------------------------------------
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { VehicleData } from '@/types/carbon';
+
+interface VehicleFormProps {
+  onSubmit: (data: VehicleData) => void;
+  onCancel: () => void;
+}
+
+export function VehicleForm({ onSubmit, onCancel }: VehicleFormProps) {
+  const [data, setData] = useState<VehicleData>({
+    vehicleType: '',
+    fuelType: '',
+    distance: 0,
+    fuelConsumption: 0,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="vehicleType">Vehicle Type</Label>
+        <Select value={data.vehicleType} onValueChange={(value) => setData({ ...data, vehicleType: value })}>
+          <SelectTrigger id="vehicleType">
+            <SelectValue placeholder="Select vehicle type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="car">Car</SelectItem>
+            <SelectItem value="motorcycle">Motorcycle</SelectItem>
+            <SelectItem value="truck">Truck</SelectItem>
+            <SelectItem value="suv">SUV</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="fuelType">Fuel Type</Label>
+        <Select value={data.fuelType} onValueChange={(value) => setData({ ...data, fuelType: value })}>
+          <SelectTrigger id="fuelType">
+            <SelectValue placeholder="Select fuel type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="petrol">Petrol</SelectItem>
+            <SelectItem value="diesel">Diesel</SelectItem>
+            <SelectItem value="electric">Electric</SelectItem>
+            <SelectItem value="hybrid">Hybrid</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="distance">Distance Traveled (km)</Label>
+        <Input
+          id="distance"
+          type="number"
+          min="0"
+          step="0.1"
+          value={data.distance || ''}
+          onChange={(e) => setData({ ...data, distance: parseFloat(e.target.value) || 0 })}
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="fuelConsumption">
+          {data.fuelType === 'electric' ? 'Energy Consumption (kWh/100km)' : 'Fuel Consumption (L/100km)'}
+        </Label>
+        <Input
+          id="fuelConsumption"
+          type="number"
+          min="0"
+          step="0.1"
+          value={data.fuelConsumption || ''}
+          onChange={(e) => setData({ ...data, fuelConsumption: parseFloat(e.target.value) || 0 })}
+          required
+        />
+      </div>
+
+      <div className="flex gap-3 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+          Cancel
+        </Button>
+        <Button type="submit" className="flex-1">
+          Calculate Emissions
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+
+
+#src/components/FoodForm.tsx---------------------------
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { FoodData } from '@/types/carbon';
+
+interface FoodFormProps {
+  onSubmit: (data: FoodData) => void;
+  onCancel: () => void;
+}
+
+export function FoodForm({ onSubmit, onCancel }: FoodFormProps) {
+  const [data, setData] = useState<FoodData>({
+    meatServings: 0,
+    dairyServings: 0,
+    vegetableServings: 0,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="meatServings">Meat Servings (per week)</Label>
+        <Input
+          id="meatServings"
+          type="number"
+          min="0"
+          value={data.meatServings || ''}
+          onChange={(e) => setData({ ...data, meatServings: parseInt(e.target.value) || 0 })}
+          placeholder="e.g., 7"
+          required
+        />
+        <p className="text-xs text-muted-foreground">Includes beef, pork, chicken, etc.</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="dairyServings">Dairy Servings (per week)</Label>
+        <Input
+          id="dairyServings"
+          type="number"
+          min="0"
+          value={data.dairyServings || ''}
+          onChange={(e) => setData({ ...data, dairyServings: parseInt(e.target.value) || 0 })}
+          placeholder="e.g., 14"
+          required
+        />
+        <p className="text-xs text-muted-foreground">Includes milk, cheese, yogurt, etc.</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="vegetableServings">Vegetable Servings (per week)</Label>
+        <Input
+          id="vegetableServings"
+          type="number"
+          min="0"
+          value={data.vegetableServings || ''}
+          onChange={(e) => setData({ ...data, vegetableServings: parseInt(e.target.value) || 0 })}
+          placeholder="e.g., 21"
+          required
+        />
+        <p className="text-xs text-muted-foreground">All plant-based foods</p>
+      </div>
+
+      <div className="flex gap-3 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+          Cancel
+        </Button>
+        <Button type="submit" className="flex-1">
+          Calculate Emissions
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+
+
+
+
+
+#
